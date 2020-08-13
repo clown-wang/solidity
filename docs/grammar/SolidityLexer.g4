@@ -325,7 +325,7 @@ mode PragmaMode;
  * Pragma token. Can contain any kind of symbol except a semicolon.
  * Note that currently the solidity parser only allows a subset of this.
  */
-//@doc:name PragmaToken
+//@doc:name pragma-token
 //@doc:no-diagram
 PragmaToken: ~[;]+;
 PragmaSemicolon: ';' -> popMode;
