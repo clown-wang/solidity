@@ -168,11 +168,11 @@ fragment DoubleQuotedStringCharacter: DoubleQuotedPrintable | EscapeSequence;
 //@doc:inline
 fragment SingleQuotedStringCharacter: SingleQuotedPrintable | EscapeSequence;
 /**
- * Any printable character expect single quote or back slash.
+ * Any printable character except single quote or back slash.
  */
 fragment SingleQuotedPrintable: [\u0020-\u0026\u0028-\u005B\u005D-\u007E];
 /**
- * Any printable character expect double quote or back slash.
+ * Any printable character except double quote or back slash.
  */
 fragment DoubleQuotedPrintable: [\u0020-\u0021\u0023-\u005B\u005D-\u007E];
 /**

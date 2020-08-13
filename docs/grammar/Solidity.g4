@@ -7,7 +7,7 @@ options { tokenVocab=SolidityLexer; }
 
 /**
  * On top level, Solidity allows pragmas, import directives, and
- * definitions of constracts, interfaces, libraries, structs and enums.
+ * definitions of contracts, interfaces, libraries, structs and enums.
  */
 sourceUnit: (
     pragmaDirective
@@ -48,14 +48,14 @@ symbolAliases: LBrace aliases+=importAliases (Comma aliases+=importAliases)* RBr
  */
 contractDefinition:
 	Abstract? Contract name=identifier
-	inhertianceSpecifierList?
+	inheritanceSpecifierList?
 	LBrace contractBodyElement* RBrace;
 /**
  * Top-level definition of an interface.
  */
 interfaceDefinition:
 	Interface name=identifier
-	inhertianceSpecifierList?
+	inheritanceSpecifierList?
 	LBrace contractBodyElement* RBrace;
 /**
  * Top-level definition of a library.
@@ -63,7 +63,7 @@ interfaceDefinition:
 libraryDefinition: Library name=identifier LBrace contractBodyElement* RBrace;
 
 //@doc:inline
-inhertianceSpecifierList:
+inheritanceSpecifierList:
     Is inheritanceSpecifiers+=inheritanceSpecifier
     (Comma inheritanceSpecifiers+=inheritanceSpecifier)*?;
 /**
@@ -75,8 +75,8 @@ inheritanceSpecifier: name=userDefinedTypeName arguments=callArgumentList?;
 /**
  * Declarations that can be used in contracts, interfaces and libraries.
  *
- * Note that interfaces and libraries may not contain state variables and constructors and libraries additionally
- * may not contain fallback or receive functions.
+ * Note that interfaces and libraries may not contain constructors, interfaces may not contain state variables
+ * and libraries may not contain fallback, receive functions nor non-constant state variables.
  */
 contractBodyElement:
     constructorDefinition
@@ -114,15 +114,22 @@ visibility: Internal | External | Private | Public;
  */
 parameterList: parameters+=parameterDeclaration (Comma parameters+=parameterDeclaration)*;
 //@doc:inline
-parameterDeclaration: type=typeName location=storageLocation? name=identifier?;
+parameterDeclaration: type=typeName location=dataLocation? name=identifier?;
 /**
  * Definition of a constructor.
  * Must always supply an implementation.
  * Note that specifying internal or public visibility is deprecated.
  */
-constructorDefinition:
+constructorDefinition
+locals[boolean payableSet = false, boolean visibilitySet = false]
+:
     Constructor LParen (arguments=parameterList)? RParen
-    (modifierInvocation | Payable | Internal | Public)*
+    (
+        modifierInvocation
+        | {!$payableSet}? Payable {$payableSet = true;}
+        | {!$visibilitySet}? Internal {$visibilitySet = true;}
+        | {!$visibilitySet}? Public {$visibilitySet = true;}
+    )*
     body=block;
 
 /**
@@ -251,21 +258,26 @@ eventDefinition:
  */
 usingDirective: Using userDefinedTypeName For (Mul | typeName) Semicolon;
 /**
- * A type name can either be an elementary type, a function type, a mapping type, a user-defined type
+ * A type name can be an elementary type, a function type, a mapping type, a user-defined type
  * (e.g. a contract or struct) or an array type.
  */
 typeName: elementaryTypeName[true] | functionTypeName | mappingType | userDefinedTypeName | typeName LBrack expression? RBrack;
 elementaryTypeName[boolean allowAddressPayable]: Address | {$allowAddressPayable}? Address Payable | Bool | String | Bytes | SignedIntegerType | UnsignedIntegerType | FixedBytes | Fixed | Ufixed;
-functionTypeName:
+functionTypeName
+locals [boolean visibilitySet = false, boolean mutabilitySet = false]
+:
     Function LParen (arguments=parameterList)? RParen
-    (visibility | stateMutability)*
+    (
+        {!$visibilitySet}? visibility {$visibilitySet = true;}
+        | {!$mutabilitySet}? stateMutability {$mutabilitySet = true;}
+    )*
     (Returns LParen returnParameters=parameterList RParen)?;
 
 /**
  * The declaration of a single variable.
  */
-variableDeclaration: type=typeName location=storageLocation? name=identifier;
-storageLocation: Memory | Storage | Calldata;
+variableDeclaration: type=typeName location=dataLocation? name=identifier;
+dataLocation: Memory | Storage | Calldata;
 
 /**
  * Complex expression.
@@ -347,16 +359,16 @@ block: LBrace statement* RBrace;
 
 statement:
     block
-	| simpleStatement
-	| ifStatement
-	| forStatement
-	| whileStatement
-	| doWhileStatement
-	| continueStatement
-	| breakStatement
-	| tryStatement
-	| returnStatement
-	| emitStatement
+    | simpleStatement
+    | ifStatement
+    | forStatement
+    | whileStatement
+    | doWhileStatement
+    | continueStatement
+    | breakStatement
+    | tryStatement
+    | returnStatement
+    | emitStatement
     | assemblyStatement
 ;
 
@@ -384,6 +396,11 @@ breakStatement: Break Semicolon;
  * A try statement. The contained expression needs to be an external function call or a contract creation.
  */
 tryStatement: Try expression (Returns LParen returnParameters=parameterList RParen)? block catchClause+;
+/**
+ * The catch clause of a try statement.
+ */
+catchClause: Catch (identifier? LParen (arguments=parameterList) RParen)? block;
+
 returnStatement: Return expression? Semicolon;
 /**
  * An emit statement. The contained expression needs to refer to an event.
@@ -392,7 +409,7 @@ emitStatement: Emit expression callArgumentList Semicolon;
 /**
  * An inline assembly block.
  * The contents of an inline assembly block use a separate scanner/lexer, i.e. the set of keywords and
- * allowed identifiers is different inline an inline assembly block.
+ * allowed identifiers is different inside an inline assembly block.
  */
 assemblyStatement: Assembly AssemblyDialect? AssemblyLBrace yulStatement* YulRBrace;
 
@@ -408,15 +425,12 @@ variableDeclarationTuple:
         (Comma (variableDeclarations+=variableDeclaration)?)*
     RParen;
 /**
- * The declaration of one with an optional initial value or a tuple of variable with required initial value.
+ * A variable declaration statement.
+ * A single variable may be declared without initial value, whereas a tuple of variables can only be
+ * declared with initial value.
  */
 variableDeclarationStatement: ((variableDeclaration (Assign expression)?) | (variableDeclarationTuple Assign expression)) Semicolon;
 expressionStatement: expression Semicolon;
-
-/**
- * The catch clause of a try statement.
- */
-catchClause: Catch (identifier? LParen (arguments=parameterList) RParen)? block;
 
 mappingType: Mapping LParen key=mappingKeyType Arrow value=typeName RParen;
 /**
@@ -462,11 +476,18 @@ yulIfStatement: YulIf cond=yulExpression body=yulBlock;
 
 yulForStatement: YulFor init=yulBlock cond=yulExpression post=yulBlock body=yulBlock;
 
+//@doc:inline
+yulSwitchCase: YulCase yulLiteral yulBlock;
 /**
- * A Yul switch can only have one default case and must have at least one non-default case.
+ * A Yul switch statement can consist of only a default-case (deprecated) or
+ * one or more non-default cases optionally followed by a default-case.
  */
-yulSwitchCase: (YulDefault | (YulCase yulLiteral)) yulBlock;
-yulSwitchStatement: YulSwitch yulExpression | yulSwitchCase+;
+yulSwitchStatement:
+    YulSwitch yulExpression
+    (
+        (yulSwitchCase+ (YulDefault yulBlock)?)
+        | (YulDefault yulBlock)
+    );
 
 yulFunctionDefinition:
 	YulFunction YulIdentifier
