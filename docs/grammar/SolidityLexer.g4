@@ -154,28 +154,48 @@ Inc: '++';
 Dec: '--';
 
 /**
- * A single quoted string literal.
+ * A single quoted string literal restricted to printable characters.
  */
 StringLiteral: '"' DoubleQuotedStringCharacter* '"' | '\'' SingleQuotedStringCharacter* '\'';
 /**
  * A single non-empty quoted string literal.
  */
 NonEmptyStringLiteral: '"' DoubleQuotedStringCharacter+ '"' | '\'' SingleQuotedStringCharacter+ '\'';
+// Note that this will also be used for Yul string literals.
 //@doc:inline
-fragment DoubleQuotedStringCharacter: [\u0020-\u0021\u0023-\u005B\u005D-\u007E] | UnicodeEscapeSequence | ('\\' [\u0020-\u0074\u0076-\u007E]);
+fragment DoubleQuotedStringCharacter: DoubleQuotedPrintable | EscapeSequence;
+// Note that this will also be used for Yul string literals.
 //@doc:inline
-fragment SingleQuotedStringCharacter: [\u0020-\u0026\u0028-\u005B\u005D-\u007E] | UnicodeEscapeSequence | ('\\' [\u0020-\u0074\u0076-\u007E]);
+fragment SingleQuotedStringCharacter: SingleQuotedPrintable | EscapeSequence;
+/**
+ * Any printable character expect single quote or back slash.
+ */
+fragment SingleQuotedPrintable: [\u0020-\u0026\u0028-\u005B\u005D-\u007E];
+/**
+ * Any printable character expect double quote or back slash.
+ */
+fragment DoubleQuotedPrintable: [\u0020-\u0021\u0023-\u005B\u005D-\u007E];
+/**
+  * Escape sequence.
+  * Apart from common single character escape sequences, line breaks can be escaped
+  * as well as four hex digit unicode escapes \\uXXXX and two digit hex escape sequences \\xXX are allowed.
+  */
+fragment EscapeSequence:
+    '\\' (
+        ['"\\bfnrtv\n\r]
+        | 'u' HexCharacter HexCharacter HexCharacter HexCharacter
+        | 'x' HexCharacter HexCharacter
+    );
+/**
+ * A single quoted string literal allowing arbitrary unicode characters.
+ */
 UnicodeStringLiteral:
     'unicode"' DoubleQuotedUnicodeStringCharacter* '"'
     | 'unicode\'' SingleQuotedUnicodeStringCharacter* '\'';
 //@doc:inline
-fragment DoubleQuotedUnicodeStringCharacter: ~["\r\n\\] | UnicodeEscapeSequence | ('\\' ~[u]);
+fragment DoubleQuotedUnicodeStringCharacter: ~["\r\n\\] | EscapeSequence;
 //@doc:inline
-fragment SingleQuotedUnicodeStringCharacter: ~['\r\n\\] | UnicodeEscapeSequence | ('\\' ~[u]);
-/**
- * Unicode escape sequences consist of \u followed by four hex digits.
- */
-fragment UnicodeEscapeSequence: '\\' 'u' HexCharacter HexCharacter HexCharacter HexCharacter;
+fragment SingleQuotedUnicodeStringCharacter: ~['\r\n\\] | EscapeSequence;
 
 /**
  * Hex strings need to consist of an even number of hex digits that may be grouped using underscores.
@@ -184,7 +204,7 @@ HexString: 'hex' (('"' EvenHexDigits? '"') | ('\'' EvenHexDigits? '\''));
 /**
  * Hex numbers consist of a prefix and an arbitrary number of hex digits that may be delimited by underscores.
  */
-HexNumber: '0' [xX] HexDigits;
+HexNumber: '0' 'x' HexDigits;
 //@doc:inline
 fragment HexDigits: HexCharacter ('_'? HexCharacter)*;
 //@doc:inline
@@ -267,6 +287,8 @@ YulArrow: '->';
 
 /**
  * Yul identifiers consist of letters, dollar signs, underscores and numbers, but may not start with a number.
+ * In inline assembly there cannot be dots in user-defined identifiers. Instead see yulPath for expressions
+ * consisting of identifiers with dots.
  */
 YulIdentifier: YulIdentifierStart YulIdentifierPart*;
 //@doc:inline
@@ -287,18 +309,9 @@ YulDecimalNumber: '0' | ([1-9] [0-9]*);
  * unescaped double-quotes or single-quotes, respectively.
  */
 YulStringLiteral:
-    '"' YulDoubleQuotedStringCharacter* '"'
-    | '\'' YulSingleQuotedStringCharacter* '\'';
-//@doc:inline
-fragment YulDoubleQuotedStringCharacter:
-    [\u0020-\u0021\u0023-\u005B\u005D-\u007E]
-    | UnicodeEscapeSequence
-    | ('\\' [\u0020-\u0074\u0076-\u007E]);
-//@doc:inline
-fragment YulSingleQuotedStringCharacter:
-    [\u0020-\u0026\u0028-\u005B\u005D-\u007E]
-    | UnicodeEscapeSequence
-    | ('\\' [\u0020-\u0074\u0076-\u007E]);
+    '"' DoubleQuotedStringCharacter* '"'
+    | '\'' SingleQuotedStringCharacter* '\'';
+
 
 YulWS: [ \t\r\n\u000C]+ -> skip ;
 YulCOMMENT: '/*' .*? '*/' -> channel(HIDDEN) ;
@@ -308,6 +321,7 @@ mode PragmaMode;
 
 /**
  * Pragma token. Can contain any kind of symbol except a semicolon.
+ * Note that currently the solidity parser only allows a subset of this.
  */
 //@doc:name PragmaToken
 //@doc:no-diagram

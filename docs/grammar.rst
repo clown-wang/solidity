@@ -8,3 +8,4 @@ Language Grammar
 
 .. a4:autogrammar:: SolidityLexer
    :only-reachable-from: Solidity.sourceUnit
+   :fragments:
