@@ -283,7 +283,9 @@ YulRParen: ')';
 YulAssign: ':=';
 YulPeriod: '.';
 YulComma: ',';
-YulArrow: '->';
+// TODO: remove whitespace workaround once the parser disallows it.
+//@doc:name ->
+YulArrow: '->' | '-' YulWS+ '>';
 
 /**
  * Yul identifiers consist of letters, dollar signs, underscores and numbers, but may not start with a number.
