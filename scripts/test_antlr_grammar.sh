@@ -116,15 +116,6 @@ done < <(
 )
 
 YUL_FILES=()
-# Add all yul tests with evm dialect.
-while IFS='' read -r line
-do
-  YUL_FILES+=("$line")
-done < <(
-  grep -ril -E \
-    "^\/\/ dialect: evm$" \
-    "${ROOT_DIR}/test/libyul"
-)
 # Add all yul optimizer tests without objects and types.
 while IFS='' read -r line
 do
