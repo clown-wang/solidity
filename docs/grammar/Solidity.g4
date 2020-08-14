@@ -10,13 +10,13 @@ options { tokenVocab=SolidityLexer; }
  * definitions of contracts, interfaces, libraries, structs and enums.
  */
 sourceUnit: (
-    pragmaDirective
-    | importDirective
-    | contractDefinition
-    | interfaceDefinition
-    | libraryDefinition
-    | structDefinition
-    | enumDefinition
+	pragmaDirective
+	| importDirective
+	| contractDefinition
+	| interfaceDefinition
+	| libraryDefinition
+	| structDefinition
+	| enumDefinition
 )* EOF;
 
 //@doc: inline
@@ -26,10 +26,10 @@ pragmaDirective: Pragma PragmaToken+ PragmaSemicolon;
  * Import directives import identifiers from different files.
  */
 importDirective:
-    Import (
-	    (path (As unitAlias=identifier)?)
-	    | (symbolAliases From path)
-	    | (Mul As unitAlias=identifier From path)
+	Import (
+		(path (As unitAlias=identifier)?)
+		| (symbolAliases From path)
+		| (Mul As unitAlias=identifier From path)
 	) Semicolon;
 //@doc: inline
 //@doc:name aliases
@@ -64,8 +64,8 @@ libraryDefinition: Library name=identifier LBrace contractBodyElement* RBrace;
 
 //@doc:inline
 inheritanceSpecifierList:
-    Is inheritanceSpecifiers+=inheritanceSpecifier
-    (Comma inheritanceSpecifiers+=inheritanceSpecifier)*?;
+	Is inheritanceSpecifiers+=inheritanceSpecifier
+	(Comma inheritanceSpecifiers+=inheritanceSpecifier)*?;
 /**
  * Inheritance specifier for contracts and interfaces.
  * Can optionally supply base constructor arguments.
@@ -79,15 +79,15 @@ inheritanceSpecifier: name=userDefinedTypeName arguments=callArgumentList?;
  * and libraries may not contain fallback, receive functions nor non-constant state variables.
  */
 contractBodyElement:
-    constructorDefinition
-    | functionDefinition
-    | modifierDefinition
-    | fallbackReceiveFunctionDefinition
-    | structDefinition
-    | enumDefinition
-    | stateVariableDeclaration
-    | eventDefinition
-    | usingDirective;
+	constructorDefinition
+	| functionDefinition
+	| modifierDefinition
+	| fallbackReceiveFunctionDefinition
+	| structDefinition
+	| enumDefinition
+	| stateVariableDeclaration
+	| eventDefinition
+	| usingDirective;
 //@doc:inline
 namedArgument: name=identifier Colon value=expression;
 /**
@@ -123,14 +123,14 @@ parameterDeclaration: type=typeName location=dataLocation? name=identifier?;
 constructorDefinition
 locals[boolean payableSet = false, boolean visibilitySet = false]
 :
-    Constructor LParen (arguments=parameterList)? RParen
-    (
-        modifierInvocation
-        | {!$payableSet}? Payable {$payableSet = true;}
-        | {!$visibilitySet}? Internal {$visibilitySet = true;}
-        | {!$visibilitySet}? Public {$visibilitySet = true;}
-    )*
-    body=block;
+	Constructor LParen (arguments=parameterList)? RParen
+	(
+		modifierInvocation
+		| {!$payableSet}? Payable {$payableSet = true;}
+		| {!$visibilitySet}? Internal {$visibilitySet = true;}
+		| {!$visibilitySet}? Public {$visibilitySet = true;}
+	)*
+	body=block;
 
 /**
  * State mutability for function types.
@@ -150,20 +150,20 @@ overrideSpecifier: Override (LParen overrides+=userDefinedTypeName (Comma overri
  */
 functionDefinition
 locals[
-    boolean visibilitySet = false,
-    boolean mutabilitySet = false,
-    boolean virtualSet = false,
-    boolean overrideSpecifierSet = false
+	boolean visibilitySet = false,
+	boolean mutabilitySet = false,
+	boolean virtualSet = false,
+	boolean overrideSpecifierSet = false
 ]
 :
 	Function (identifier | Fallback | Receive)
 	LParen (arguments=parameterList)? RParen
 	(
-	    {!$visibilitySet}? visibility {$visibilitySet = true;}
-	    | {!$mutabilitySet}? stateMutability {$mutabilitySet = true;}
-	    | modifierInvocation
-	    | {!$virtualSet}? Virtual {$virtualSet = true;}
-	    | {!$overrideSpecifierSet}? overrideSpecifier {$overrideSpecifierSet = true;}
+		{!$visibilitySet}? visibility {$visibilitySet = true;}
+		| {!$mutabilitySet}? stateMutability {$mutabilitySet = true;}
+		| modifierInvocation
+		| {!$virtualSet}? Virtual {$virtualSet = true;}
+		| {!$overrideSpecifierSet}? overrideSpecifier {$overrideSpecifierSet = true;}
 	 )*
 	(Returns LParen returnParameters=parameterList RParen)?
 	(Semicolon | body=block);
@@ -174,36 +174,36 @@ locals[
  */
 modifierDefinition
 locals[
-    boolean virtualSet = false,
-    boolean overrideSpecifierSet = false
+	boolean virtualSet = false,
+	boolean overrideSpecifierSet = false
 ]
 :
-    Modifier name=identifier
-    (LParen (arguments=parameterList)? RParen)?
-    (
-        {!$virtualSet}? Virtual {$virtualSet = true;}
-        | {!$overrideSpecifierSet}? overrideSpecifier {$overrideSpecifierSet = true;}
-    )*
-    (Semicolon | body=block);
+	Modifier name=identifier
+	(LParen (arguments=parameterList)? RParen)?
+	(
+		{!$virtualSet}? Virtual {$virtualSet = true;}
+		| {!$overrideSpecifierSet}? overrideSpecifier {$overrideSpecifierSet = true;}
+	)*
+	(Semicolon | body=block);
 
 /**
  * Definitions of the special fallback and receive functions.
  */
 fallbackReceiveFunctionDefinition
 locals[
-    boolean visibilitySet = false,
-    boolean mutabilitySet = false,
-    boolean virtualSet = false,
-    boolean overrideSpecifierSet = false
+	boolean visibilitySet = false,
+	boolean mutabilitySet = false,
+	boolean virtualSet = false,
+	boolean overrideSpecifierSet = false
 ]
 :
 	kind=(Fallback | Receive) LParen RParen
 	(
-	    {!$visibilitySet}? visibility {$visibilitySet = true;}
-	    | {!$mutabilitySet}? stateMutability {$mutabilitySet = true;}
-	    | modifierInvocation
-	    | {!$virtualSet}? Virtual {$virtualSet = true;}
-	    | {!$overrideSpecifierSet}? overrideSpecifier {$overrideSpecifierSet = true;}
+		{!$visibilitySet}? visibility {$visibilitySet = true;}
+		| {!$mutabilitySet}? stateMutability {$mutabilitySet = true;}
+		| modifierInvocation
+		| {!$virtualSet}? Virtual {$virtualSet = true;}
+		| {!$overrideSpecifierSet}? overrideSpecifier {$overrideSpecifierSet = true;}
 	 )*
 	(Semicolon | body=block);
 
@@ -228,12 +228,12 @@ locals [boolean constantnessSet = false, boolean visibilitySet = false, boolean 
 :
 	type=typeName
 	(
-	    {!$visibilitySet}? Public {$visibilitySet = true;}
-	    | {!$visibilitySet}? Private {$visibilitySet = true;}
-	    | {!$visibilitySet}? Internal {$visibilitySet = true;}
-	    | {!$constantnessSet}? Constant {$constantnessSet = true;}
-	    | {!$overrideSpecifierSet}? overrideSpecifier {$overrideSpecifierSet = true;}
-	    | {!$constantnessSet}? Immutable {$constantnessSet = true;}
+		{!$visibilitySet}? Public {$visibilitySet = true;}
+		| {!$visibilitySet}? Private {$visibilitySet = true;}
+		| {!$visibilitySet}? Internal {$visibilitySet = true;}
+		| {!$constantnessSet}? Constant {$constantnessSet = true;}
+		| {!$overrideSpecifierSet}? overrideSpecifier {$overrideSpecifierSet = true;}
+		| {!$constantnessSet}? Immutable {$constantnessSet = true;}
 	)*
 	name=identifier
 	(Assign initialValue=expression)?
@@ -247,10 +247,10 @@ eventParameter: type=typeName Indexed? name=identifier?;
  * Definition of an event. Can occur in contracts, libraries or interfaces.
  */
 eventDefinition:
-    Event name=identifier
-    LParen (parameters+=eventParameter (Comma parameters+=eventParameter)*)? RParen
-    Anonymous?
-    Semicolon;
+	Event name=identifier
+	LParen (parameters+=eventParameter (Comma parameters+=eventParameter)*)? RParen
+	Anonymous?
+	Semicolon;
 
 /**
  * Using directive to bind library functions to types.
@@ -266,12 +266,12 @@ elementaryTypeName[boolean allowAddressPayable]: Address | {$allowAddressPayable
 functionTypeName
 locals [boolean visibilitySet = false, boolean mutabilitySet = false]
 :
-    Function LParen (arguments=parameterList)? RParen
-    (
-        {!$visibilitySet}? visibility {$visibilitySet = true;}
-        | {!$mutabilitySet}? stateMutability {$mutabilitySet = true;}
-    )*
-    (Returns LParen returnParameters=parameterList RParen)?;
+	Function LParen (arguments=parameterList)? RParen
+	(
+		{!$visibilitySet}? visibility {$visibilitySet = true;}
+		| {!$mutabilitySet}? stateMutability {$mutabilitySet = true;}
+	)*
+	(Returns LParen returnParameters=parameterList RParen)?;
 
 /**
  * The declaration of a single variable.
@@ -310,8 +310,8 @@ expression:
 	|<assoc=right> expression Conditional expression Colon expression # Conditional
 	|<assoc=right> expression assignOp expression # Assignment
 	| New typeName # NewExpression
-    | tupleExpression # Tuple
-    | inlineArrayExpression # InlineArray
+	| tupleExpression # Tuple
+	| inlineArrayExpression # InlineArray
  	| (
 		identifier
 		| literal
@@ -358,18 +358,18 @@ numberLiteral: (DecimalNumber | HexNumber) NumberUnit?;
 block: LBrace statement* RBrace;
 
 statement:
-    block
-    | simpleStatement
-    | ifStatement
-    | forStatement
-    | whileStatement
-    | doWhileStatement
-    | continueStatement
-    | breakStatement
-    | tryStatement
-    | returnStatement
-    | emitStatement
-    | assemblyStatement
+	block
+	| simpleStatement
+	| ifStatement
+	| forStatement
+	| whileStatement
+	| doWhileStatement
+	| continueStatement
+	| breakStatement
+	| tryStatement
+	| returnStatement
+	| emitStatement
+	| assemblyStatement
 ;
 
 //@doc:inline
@@ -420,10 +420,10 @@ variableDeclarationList: variableDeclarations+=variableDeclaration (Comma variab
  * May contain empty fields.
  */
 variableDeclarationTuple:
-    LParen
-        (Comma* variableDeclarations+=variableDeclaration)
-        (Comma (variableDeclarations+=variableDeclaration)?)*
-    RParen;
+	LParen
+		(Comma* variableDeclarations+=variableDeclaration)
+		(Comma (variableDeclarations+=variableDeclaration)?)*
+	RParen;
 /**
  * A variable declaration statement.
  * A single variable may be declared without initial value, whereas a tuple of variables can only be
@@ -444,7 +444,7 @@ mappingKeyType: elementaryTypeName[false] | userDefinedTypeName;
  * leave statements are only valid within function bodies.
  */
 yulStatement:
-    yulBlock
+	yulBlock
 	| yulVariableDeclaration
 	| yulAssignment
 	| yulFunctionCall
@@ -463,8 +463,8 @@ yulBlock: YulLBrace yulStatement* YulRBrace;
  * If multiple variables are declared, only a function call is a valid initial value.
  */
 yulVariableDeclaration:
-    (YulLet variables+=YulIdentifier (YulAssign yulExpression)?)
-    | (YulLet variables+=YulIdentifier (YulComma variables+=YulIdentifier)* (YulAssign yulFunctionCall)?);
+	(YulLet variables+=YulIdentifier (YulAssign yulExpression)?)
+	| (YulLet variables+=YulIdentifier (YulComma variables+=YulIdentifier)* (YulAssign yulFunctionCall)?);
 
 /**
  * Any expression can be assigned to a single Yul variable, whereas
@@ -483,11 +483,11 @@ yulSwitchCase: YulCase yulLiteral yulBlock;
  * one or more non-default cases optionally followed by a default-case.
  */
 yulSwitchStatement:
-    YulSwitch yulExpression
-    (
-        (yulSwitchCase+ (YulDefault yulBlock)?)
-        | (YulDefault yulBlock)
-    );
+	YulSwitch yulExpression
+	(
+		(yulSwitchCase+ (YulDefault yulBlock)?)
+		| (YulDefault yulBlock)
+	);
 
 yulFunctionDefinition:
 	YulFunction YulIdentifier

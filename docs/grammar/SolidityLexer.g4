@@ -4,10 +4,10 @@ lexer grammar SolidityLexer;
  * Keywords reserved for future use in Solidity.
  */
 ReservedKeywords:
-    'after' | 'alias' | 'apply' | 'auto' | 'case' | 'copyof' | 'default' | 'define' | 'final'
-    | 'implements' | 'in' | 'inline' | 'let' | 'macro' | 'match' | 'mutable' | 'null' | 'of'
-    | 'partial' | 'promise' | 'reference' | 'relocatable' | 'sealed' | 'sizeof' | 'static'
-    | 'supports' | 'switch' | 'typedef' | 'typeof' | 'unchecked' | 'var';
+	'after' | 'alias' | 'apply' | 'auto' | 'case' | 'copyof' | 'default' | 'define' | 'final'
+	| 'implements' | 'in' | 'inline' | 'let' | 'macro' | 'match' | 'mutable' | 'null' | 'of'
+	| 'partial' | 'promise' | 'reference' | 'relocatable' | 'sealed' | 'sizeof' | 'static'
+	| 'supports' | 'switch' | 'typedef' | 'typeof' | 'unchecked' | 'var';
 
 Pragma: 'pragma' -> pushMode(PragmaMode);
 Abstract: 'abstract';
@@ -181,17 +181,17 @@ fragment DoubleQuotedPrintable: [\u0020-\u0021\u0023-\u005B\u005D-\u007E];
   * as well as four hex digit unicode escapes \\uXXXX and two digit hex escape sequences \\xXX are allowed.
   */
 fragment EscapeSequence:
-    '\\' (
-        ['"\\bfnrtv\n\r]
-        | 'u' HexCharacter HexCharacter HexCharacter HexCharacter
-        | 'x' HexCharacter HexCharacter
-    );
+	'\\' (
+		['"\\bfnrtv\n\r]
+		| 'u' HexCharacter HexCharacter HexCharacter HexCharacter
+		| 'x' HexCharacter HexCharacter
+	);
 /**
  * A single quoted string literal allowing arbitrary unicode characters.
  */
 UnicodeStringLiteral:
-    'unicode"' DoubleQuotedUnicodeStringCharacter* '"'
-    | 'unicode\'' SingleQuotedUnicodeStringCharacter* '\'';
+	'unicode"' DoubleQuotedUnicodeStringCharacter* '"'
+	| 'unicode\'' SingleQuotedUnicodeStringCharacter* '\'';
 //@doc:inline
 fragment DoubleQuotedUnicodeStringCharacter: ~["\r\n\\] | EscapeSequence;
 //@doc:inline
@@ -265,16 +265,16 @@ YulTrue: 'true';
  * Builtin functions in the EVM Yul dialect.
  */
 YulEVMBuiltin:
-    'stop' | 'add' | 'sub' | 'mul' | 'div' | 'sdiv' | 'mod' | 'smod' | 'exp' | 'not'
-    | 'lt' | 'gt' | 'slt' | 'sgt' | 'eq' | 'iszero' | 'and' | 'or' | 'xor' | 'byte'
-    | 'shl' | 'shr' | 'sar' | 'addmod' | 'mulmod' | 'signextend' | 'keccak256'
-    | 'pop' | 'mload' | 'mstore' | 'mstore8' | 'sload' | 'sstore' | 'msize' | 'gas'
-    | 'address' | 'balance' | 'selfbalance' | 'caller' | 'callvalue' | 'calldataload'
-    | 'calldatasize' | 'calldatacopy' | 'extcodesize' | 'extcodecopy' | 'returndatasize'
-    | 'returndatacopy' | 'extcodehash' | 'create' | 'create2' | 'call' | 'callcode'
-    | 'delegatecall' | 'staticcall' | 'return' | 'revert' | 'selfdestruct' | 'invalid'
-    | 'log0' | 'log1' | 'log2' | 'log3' | 'log4' | 'chainid' | 'origin' | 'gasprice'
-    | 'blockhash' | 'coinbase' | 'timestamp' | 'number' | 'difficulty' | 'gaslimit';
+	'stop' | 'add' | 'sub' | 'mul' | 'div' | 'sdiv' | 'mod' | 'smod' | 'exp' | 'not'
+	| 'lt' | 'gt' | 'slt' | 'sgt' | 'eq' | 'iszero' | 'and' | 'or' | 'xor' | 'byte'
+	| 'shl' | 'shr' | 'sar' | 'addmod' | 'mulmod' | 'signextend' | 'keccak256'
+	| 'pop' | 'mload' | 'mstore' | 'mstore8' | 'sload' | 'sstore' | 'msize' | 'gas'
+	| 'address' | 'balance' | 'selfbalance' | 'caller' | 'callvalue' | 'calldataload'
+	| 'calldatasize' | 'calldatacopy' | 'extcodesize' | 'extcodecopy' | 'returndatasize'
+	| 'returndatacopy' | 'extcodehash' | 'create' | 'create2' | 'call' | 'callcode'
+	| 'delegatecall' | 'staticcall' | 'return' | 'revert' | 'selfdestruct' | 'invalid'
+	| 'log0' | 'log1' | 'log2' | 'log3' | 'log4' | 'chainid' | 'origin' | 'gasprice'
+	| 'blockhash' | 'coinbase' | 'timestamp' | 'number' | 'difficulty' | 'gaslimit';
 
 YulLBrace: '{' -> pushMode(YulMode);
 YulRBrace: '}' -> popMode;
@@ -311,8 +311,8 @@ YulDecimalNumber: '0' | ([1-9] [0-9]*);
  * unescaped double-quotes or single-quotes, respectively.
  */
 YulStringLiteral:
-    '"' DoubleQuotedStringCharacter* '"'
-    | '\'' SingleQuotedStringCharacter* '\'';
+	'"' DoubleQuotedStringCharacter* '"'
+	| '\'' SingleQuotedStringCharacter* '\'';
 
 
 YulWS: [ \t\r\n\u000C]+ -> skip ;
