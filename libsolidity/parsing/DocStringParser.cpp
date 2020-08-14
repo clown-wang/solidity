@@ -32,19 +32,12 @@ using namespace solidity::frontend;
 
 namespace
 {
-
-string::const_iterator skipLineOrEOS(
-	string::const_iterator _nlPos,
-	string::const_iterator _end
-)
+string::const_iterator skipLineOrEOS(string::const_iterator _nlPos, string::const_iterator _end)
 {
 	return (_nlPos == _end) ? _end : ++_nlPos;
 }
 
-string::const_iterator firstNonIdentifier(
-	string::const_iterator _pos,
-	string::const_iterator _end
-)
+string::const_iterator firstNonIdentifier(string::const_iterator _pos, string::const_iterator _end)
 {
 	auto currPos = _pos;
 	if (currPos == _pos && isIdentifierStart(*currPos))
@@ -56,19 +49,14 @@ string::const_iterator firstNonIdentifier(
 	return currPos;
 }
 
-string::const_iterator firstWhitespaceOrNewline(
-	string::const_iterator _pos,
-	string::const_iterator _end
-)
+string::const_iterator
+firstWhitespaceOrNewline(string::const_iterator _pos, string::const_iterator _end)
 {
 	return boost::range::find_first_of(make_pair(_pos, _end), " \t\n");
 }
 
 
-string::const_iterator skipWhitespace(
-	string::const_iterator _pos,
-	string::const_iterator _end
-)
+string::const_iterator skipWhitespace(string::const_iterator _pos, string::const_iterator _end)
 {
 	auto currPos = _pos;
 	while (currPos != _end && (*currPos == ' ' || *currPos == '\t'))
@@ -99,7 +87,7 @@ void DocStringParser::parse(string const& _docString, ErrorReporter& _errorRepor
 			auto tagDataPos = (tagNameEndPos != end) ? tagNameEndPos + 1 : tagNameEndPos;
 			currPos = parseDocTag(tagDataPos, end, tagName);
 		}
-		else if (!!m_lastTag) // continuation of the previous tag
+		else if (!!m_lastTag)  // continuation of the previous tag
 			currPos = parseDocTagLine(currPos, end, true);
 		else if (currPos != end)
 		{
@@ -109,7 +97,7 @@ void DocStringParser::parse(string const& _docString, ErrorReporter& _errorRepor
 				currPos = parseDocTag(currPos, end, "notice");
 				continue;
 			}
-			else if (nlPos == end) //end of text
+			else if (nlPos == end)	// end of text
 				break;
 			// else skip the line if a newline was found and we get here
 			currPos = nlPos + 1;
@@ -146,7 +134,10 @@ DocStringParser::iter DocStringParser::parseDocTagParam(iter _pos, iter _end)
 
 	if (descStartPos == nlPos)
 	{
-		m_errorReporter->docstringParsingError(9942_error, "No description given for param " + paramName);
+		m_errorReporter->docstringParsingError(
+			9942_error,
+			"No description given for param " + paramName
+		);
 		return _end;
 	}
 

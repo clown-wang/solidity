@@ -30,7 +30,6 @@
 
 namespace solidity::yul
 {
-
 /**
  * Component that checks whether all variables are reachable on the stack and
  * returns a mapping from function name to the largest stack difference found
@@ -44,11 +43,8 @@ namespace solidity::yul
 class CompilabilityChecker
 {
 public:
-	static std::map<YulString, int> run(
-		Dialect const& _dialect,
-		Object const& _object,
-		bool _optimizeStackAllocation
-	);
+	static std::map<YulString, int>
+	run(Dialect const& _dialect, Object const& _object, bool _optimizeStackAllocation);
 };
 
 }

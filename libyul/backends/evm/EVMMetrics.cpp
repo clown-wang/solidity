@@ -16,8 +16,8 @@
 */
 // SPDX-License-Identifier: GPL-3.0
 /**
-* Module providing metrics for the EVM optimizer.
-*/
+ * Module providing metrics for the EVM optimizer.
+ */
 
 #include <libyul/backends/evm/EVMMetrics.h>
 
@@ -53,11 +53,8 @@ size_t GasMeter::combineCosts(std::pair<size_t, size_t> _costs) const
 }
 
 
-pair<size_t, size_t> GasMeterVisitor::costs(
-	Expression const& _expression,
-	EVMDialect const& _dialect,
-	bool _isCreation
-)
+pair<size_t, size_t>
+GasMeterVisitor::costs(Expression const& _expression, EVMDialect const& _dialect, bool _isCreation)
 {
 	GasMeterVisitor gmv(_dialect, _isCreation);
 	gmv.visit(_expression);
@@ -90,8 +87,7 @@ void GasMeterVisitor::operator()(FunctionCall const& _funCall)
 void GasMeterVisitor::operator()(Literal const& _lit)
 {
 	m_runGas += evmasm::GasMeter::runGas(evmasm::Instruction::PUSH1);
-	m_dataGas +=
-		singleByteDataGas() +
+	m_dataGas += singleByteDataGas() +
 		static_cast<size_t>(evmasm::GasMeter::dataGas(
 			toCompactBigEndian(valueOfLiteral(_lit), 1),
 			m_isCreation,

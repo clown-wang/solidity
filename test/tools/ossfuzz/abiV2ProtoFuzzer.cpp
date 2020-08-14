@@ -39,9 +39,7 @@ namespace
 static size_t const expectedOutputLength = 32;
 /// Expected output value is decimal 0
 static uint8_t const expectedOutput[expectedOutputLength] = {
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-};
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 /// Compares the contents of the memory address pointed to
 /// by `_result` of `_length` bytes to the expected output.
@@ -76,11 +74,8 @@ evmc_message initializeMessage(bytes const& _input)
 /// Accepts host context implementation, and keccak256 hash of the function
 /// to be called at a specified address in the simulated blockchain as
 /// input and returns the result of the execution of the called function.
-evmc::result executeContract(
-	EVMHost& _hostContext,
-	bytes const& _functionHash,
-	evmc_address _deployedAddress
-)
+evmc::result
+executeContract(EVMHost& _hostContext, bytes const& _functionHash, evmc_address _deployedAddress)
 {
 	evmc_message message = initializeMessage(_functionHash);
 	message.destination = _deployedAddress;
@@ -105,8 +100,8 @@ DEFINE_PROTO_FUZZER(Contract const& _input)
 
 	if (const char* dump_path = getenv("PROTO_FUZZER_DUMP_PATH"))
 	{
-		// With libFuzzer binary run this to generate the solidity source file x.sol from a proto input:
-		// PROTO_FUZZER_DUMP_PATH=x.sol ./a.out proto-input
+		// With libFuzzer binary run this to generate the solidity source file x.sol from a proto
+		// input: PROTO_FUZZER_DUMP_PATH=x.sol ./a.out proto-input
 		ofstream of(dump_path);
 		of << contract_source;
 	}
@@ -155,11 +150,8 @@ DEFINE_PROTO_FUZZER(Contract const& _input)
 
 	// Execute test function and signal failure if EVM reverted or
 	// did not return expected output on successful execution.
-	evmc::result callResult = executeContract(
-		hostContext,
-		fromHex(hexEncodedInput),
-		createResult.create_address
-	);
+	evmc::result callResult =
+		executeContract(hostContext, fromHex(hexEncodedInput), createResult.create_address);
 
 	// We don't care about EVM One failures other than EVMC_REVERT
 	solAssert(callResult.status_code != EVMC_REVERT, "Proto ABIv2 fuzzer: EVM One reverted");

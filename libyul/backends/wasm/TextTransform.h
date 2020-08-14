@@ -32,7 +32,6 @@ struct AsmAnalysisInfo;
 
 namespace solidity::yul::wasm
 {
-
 class TextTransform
 {
 public:
@@ -60,10 +59,8 @@ private:
 	std::string transform(wasm::FunctionDefinition const& _function);
 
 	std::string visit(wasm::Expression const& _expression);
-	std::string joinTransformed(
-		std::vector<wasm::Expression> const& _expressions,
-		char _separator = ' '
-	);
+	std::string
+	joinTransformed(std::vector<wasm::Expression> const& _expressions, char _separator = ' ');
 
 	static std::string encodeType(wasm::Type _type);
 };

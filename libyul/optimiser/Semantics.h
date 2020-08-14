@@ -42,7 +42,9 @@ public:
 	explicit SideEffectsCollector(
 		Dialect const& _dialect,
 		std::map<YulString, SideEffects> const* _functionSideEffects = nullptr
-	): m_dialect(_dialect), m_functionSideEffects(_functionSideEffects) {}
+	):
+		m_dialect(_dialect), m_functionSideEffects(_functionSideEffects)
+	{}
 	SideEffectsCollector(
 		Dialect const& _dialect,
 		Expression const& _expression,
@@ -85,10 +87,8 @@ private:
 class SideEffectsPropagator
 {
 public:
-	static std::map<YulString, SideEffects> sideEffects(
-		Dialect const& _dialect,
-		CallGraph const& _directCallGraph
-	);
+	static std::map<YulString, SideEffects>
+	sideEffects(Dialect const& _dialect, CallGraph const& _directCallGraph);
 };
 
 /**
@@ -149,7 +149,9 @@ public:
 	explicit MovableChecker(
 		Dialect const& _dialect,
 		std::map<YulString, SideEffects> const* _functionSideEffects = nullptr
-	): SideEffectsCollector(_dialect, _functionSideEffects) {}
+	):
+		SideEffectsCollector(_dialect, _functionSideEffects)
+	{}
 	MovableChecker(Dialect const& _dialect, Expression const& _expression);
 
 	void operator()(Identifier const& _identifier) override;
@@ -174,7 +176,14 @@ class TerminationFinder
 {
 public:
 	// TODO check all uses of TerminationFinder!
-	enum class ControlFlow { FlowOut, Break, Continue, Terminate, Leave };
+	enum class ControlFlow
+	{
+		FlowOut,
+		Break,
+		Continue,
+		Terminate,
+		Leave
+	};
 
 	TerminationFinder(Dialect const& _dialect): m_dialect(_dialect) {}
 
